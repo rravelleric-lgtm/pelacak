@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phone Number Lookup</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .container { max-width: 600px; margin: auto; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        input, button { padding: 10px; margin: 10px 0; width: 100%; }
+        button { background-color: #007bff; color: white; border: none; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        #result { margin-top: 20px; padding: 10px; background-color: #e9ecef; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phone Number Lookup</h1>
+        <p>Masukkan nomor telepon internasional (contoh: +628123456789) untuk info dasar.</p>
+        <input type="text" id="phoneNumber" placeholder="Masukkan nomor telepon (dengan kode negara)">
+        <button onclick="lookupPhone()">Cari Info</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        async function lookupPhone() {
+            const phone = document.getElementById('phoneNumber').value.trim();
+            const resultDiv = document.getElementById('result');
+            
+            if (!phone) {
+                resultDiv.innerHTML = '<p style="color: red;">Masukkan nomor telepon!</p>';
+                return;
+            }
+            
+            // API NumVerify (gratis, tapi batas request harian)
+            const apiKey = 'YOUR_API_KEY_HERE'; // Dapatkan dari numverify.com (gratis untuk basic)
+            const url = `http://apilayer.net/api/validate?access_key=${apiKey}&number=${encodeURIComponent(phone)}`;
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                if (data.valid) {
+                    resultDiv.innerHTML = `
+                        <h3>Hasil Lookup:</h3>
+                        <p><strong>Nomor:</strong> ${data.number}</p>
+                        <p><strong>Negara:</strong> ${data.country_name} (${data.country_code})</p>
+                        <p><strong>Carrier:</strong> ${data.carrier || 'Tidak tersedia'}</p>
+                        <p><strong>Lokasi:</strong> ${data.location || 'Tidak tersedia'}</p>
+                        <p><strong>Valid:</strong> Ya</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = '<p style="color: red;">Nomor tidak valid atau tidak ditemukan.</p>';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = '<p style="color: red;">Error: Gagal mengambil data. Periksa koneksi atau API key.</p>';
+            }
+        }
+    </script>
+</body>
+</html>
